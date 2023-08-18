@@ -13,13 +13,17 @@ class ViewController: UIViewController {
     var historyArray: [String] = []
     let textRU: UITextField = {
         let label = UITextField()
-        label.placeholder = "Введите текст"
+      //  label.frame = CGRect(x: 50, y: 100, width: 200, height: 60)
+      //  label.backgroundColor = .black
+        label.textColor = .white
+        label.attributedPlaceholder = NSAttributedString(string: "Введите текст", attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
         return label
     }()
     
     let result: UILabel = {
         let label = UILabel()
         label.text = "Перевод"
+        label.textColor = .white
         return label
     }()
     let translate: UIButton = {
@@ -36,6 +40,12 @@ class ViewController: UIViewController {
         button.configuration = .filled()
         return button
     }()
+    let backImage: UIImageView = {
+        let image = UIImageView(frame: UIScreen.main.bounds)
+        image.image = UIImage(named: "backimage")
+        image.contentMode = .scaleToFill
+        return image
+    }()
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(textRU)
@@ -43,7 +53,8 @@ class ViewController: UIViewController {
         view.addSubview(translate)
         view.addSubview(history)
         makeConstraints()
-  
+        self.view.insertSubview(backImage, at: 0)
+
     }
     func makeConstraints() {
         textRU.snp.makeConstraints {
@@ -86,7 +97,7 @@ class ViewController: UIViewController {
                         let result = try decoder.decode(Welcome.self, from: data)
                         if let translation = result.def.first?.tr.first?.text {
                             self.result.text = translation
-                            self.historyArray.append(translation)
+                             self.addHistory(text: translation)
                         } else {
                             self.result.text = "Перевод не найден"
                         }
@@ -101,9 +112,10 @@ class ViewController: UIViewController {
             }
         }
     func addHistory(text: String) {
-       var historyArray = UserDefaults.standard.stringArray(forKey: "history") ?? []
+        historyArray = UserDefaults.standard.stringArray(forKey: "history") ?? []
         historyArray.append(text)
         UserDefaults.standard.set(historyArray, forKey: "history")
+      //UserDefaults.standard.synchronize()
     }
     @objc func historyButton() {
         print(historyArray)

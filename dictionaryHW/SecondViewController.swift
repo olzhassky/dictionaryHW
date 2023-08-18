@@ -11,7 +11,7 @@ import SnapKit
 
 class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var historyArray: [String] = []
-    
+ 
     let table: UITableView = {
         let table = UITableView()
        return table
@@ -25,6 +25,8 @@ class SecondViewController: UIViewController, UITableViewDelegate, UITableViewDa
         table.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+
+        
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return historyArray.count
