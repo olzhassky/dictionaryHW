@@ -102,7 +102,7 @@ class ViewController: UIViewController {
                         if let translation = result.def.first?.tr.first?.text {
                             self.result.text = translation
                             self.addHistory(text: translation)
-                            self.cache.setObject(translation as NSString, forKey: text as NSString)
+                            self.cache.setObject(NSString(string: translation), forKey: NSString(string: text))
                             
                         } else {
                             self.result.text = "Перевод не найден"
