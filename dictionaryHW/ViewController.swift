@@ -10,6 +10,7 @@ import Alamofire
 import SnapKit
 
 class ViewController: UIViewController {
+    let cache = NSCache<NSString, NSString>()
     var historyArray: [String] = []
     let textRU: UITextField = {
         let label = UITextField()
@@ -77,16 +78,19 @@ class ViewController: UIViewController {
     }
     
     @objc func translateButton() {
-            guard let text = textRU.text, !text.isEmpty else {
-                result.text = "Введите текст"
-                return
-            }
+        guard let text = textRU.text, !text.isEmpty else {
+            result.text = "Введите текст"
+            return
+        }
+        if let translationCache = cache.object(forKey: NSString(string: text)) {
+            result.text = translationCache as String
+        } else {
             guard let translation = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
                 result.text = "Ошибка"
                 return
             }
-        let en = "en-ru"
-        let ru = "ru-en" // для тестов
+            let en = "en-ru"
+            let ru = "ru-en" // для тестов
             let url = "https://dictionary.yandex.net/api/v1/dicservice.json/lookup?key=dict.1.1.20230817T204836Z.a24d3b07ee246d8f.3c9e6b9e1612c81554e307eb54e1a2cb4bc47170&lang=\(ru)&text=\(translation)"
             
             AF.request(url).responseData { response in
@@ -97,7 +101,9 @@ class ViewController: UIViewController {
                         let result = try decoder.decode(Welcome.self, from: data)
                         if let translation = result.def.first?.tr.first?.text {
                             self.result.text = translation
-                             self.addHistory(text: translation)
+                            self.addHistory(text: translation)
+                            self.cache.setObject(translation as NSString, forKey: text as NSString)
+                            
                         } else {
                             self.result.text = "Перевод не найден"
                         }
@@ -111,6 +117,7 @@ class ViewController: UIViewController {
                 }
             }
         }
+    }
     func addHistory(text: String) {
         historyArray = UserDefaults.standard.stringArray(forKey: "history") ?? []
         historyArray.append(text)
